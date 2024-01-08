@@ -14,7 +14,9 @@
 		  <div class="sample">
         <form>
           <div class="progress">
-            <div class="progress-bar"></div>
+            <div class="progress-bar"
+            :style="progressStyles"
+            ></div>
           </div>
             <app-field
               v-for="field,i in info" 
@@ -25,7 +27,7 @@
               @updated="onUpdate(i, $event)"
               >
             </app-field>
-				<button class="btn btn-primary">
+				<button class="btn btn-primary" :disabled="!formReady">
 					Send Data
 				</button>
 			</form>
@@ -115,9 +117,22 @@
 					}
 				]
 			}),
+      computed:{
+        fieldDone(){
+         //return this.info.reduce((total, field) => 
+          //total + (field.valid ? 1 : 0), 0)
+          return this.info.filter(field => field.valid).length
+        },
+        formReady(){
+          return this.fieldDone >= this.info.length
+        },
+        progressStyles(){
+          let rel = (this.fieldDone / this.info.length) * 100
+          return {width: rel + '%'}
+        }
+      },
       methods:{
         onUpdate(i, val){
-          console.log(i, val)
           let field = this.info[i];
           field.value = val.trim()
           field.valid = field.pattern.test(field.value)
